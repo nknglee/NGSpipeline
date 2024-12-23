@@ -1,0 +1,27 @@
+#4_VariantCalling: index BAM files, haplotype calling
+
+#!/bin/bash
+#SBATCH --verbose
+#SBATCH -c 14
+#SBATCH -p all
+#SBATCH -J 4_VariantCalling
+#SBATCH -t 0-24:00:00
+#SBATCH -o 
+#SBATCH -e 
+
+#module load & libraries
+module purge
+eval "$(conda shell.bash hook)"
+conda activate ngs
+
+#variables
+DAT=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/fastq
+REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
+HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers
+
+#code
+#Index BAM files - samtools
+#cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools index ${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam"
+
+#Haplotype calling - GATK
+#cat ${HOM}/sample_list | parallel --gnu -j 14 "gatk --java-options -Xmx32G HaplotypeCaller -R ${REF}/IRGSP-1.0_genome.fasta -I ${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam -O ${HOM}/mapped/{}.mapped.RG.sort.rmdup.g.vcf.gz -ERC GVCF"
