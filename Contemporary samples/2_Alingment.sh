@@ -4,10 +4,10 @@
 #SBATCH --verbose
 #SBATCH -c 14
 #SBATCH -p short
-#SBATCH -J read_processing_farmers
+#SBATCH -J 2_Alighnemt
 #SBATCH -t 0-24:00:00
-#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/read_processing_farmers3.log
-#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/read_processing_farmers3.err
+#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/2_Alighnemt.log
+#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/2_Alighnemt.err
 
 #module load & libraries
 module purge
@@ -21,7 +21,7 @@ HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers
 
 #code
 #mapping-bwa mem
-#cat ${HOM}/sample_list | parallel --gnu -j 14 "bwa mem ${REF}/IRGSP-1.0_genome.fasta ${HOM}/trim/{}_1_paired.fastq.gz ${HOM}/trim/{}_2_paired.fastq.gz > ${HOM}/mapping/{}.sam"
+cat ${HOM}/sample_list | parallel --gnu -j 14 "bwa mem ${REF}/IRGSP-1.0_genome.fasta ${HOM}/trim/{}_1_paired.fastq.gz ${HOM}/trim/{}_2_paired.fastq.gz > ${HOM}/mapping/{}.sam"
 
 #deduplication of mapped&unmapped reads-samtools,picard
 #mapped
