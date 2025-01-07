@@ -4,8 +4,10 @@
 #SBATCH --verbose
 #SBATCH -c 14
 #SBATCH -p all
-#SBATCH -J read_pre-processing
+#SBATCH -J 1_pre-processing
 #SBATCH -t 0-24:00:00
+#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/1_pre-processing.log
+#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/1_pre-processing.err
 
 #module load & libraries
 module purge
