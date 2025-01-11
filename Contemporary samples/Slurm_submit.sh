@@ -8,3 +8,5 @@ sed "s/ARRAY_SIZE/${ARRAY_SIZE}/" script.sh > Modified_script.sh
 
 # Submit the job using modified script
 sbatch ./Modified_script.sh
+
+#Submit command: (change the script.sh first) sbatch ./Slurm_submit.sh
