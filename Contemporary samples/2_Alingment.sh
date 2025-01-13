@@ -5,8 +5,8 @@
 #SBATCH -p all
 #SBATCH -J 2_Alighnemt
 #SBATCH -t 0-24:00:00
-#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/2_Alighnemt.log
-#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/2_Alighnemt.err
+#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/2_Alignment_%A_%a.log
+#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/2_Alignment_%A_%a.err
 #SBATCH --array=1-ARRAY_SIZE
 
 #module load & libraries
