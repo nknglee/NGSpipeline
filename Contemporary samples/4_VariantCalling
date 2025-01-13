@@ -27,9 +27,14 @@ REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
 HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
 SAMPLE=$(ls ${DAT}/*_1.fastq.gz | rev | cut -d "/" -f 1 | rev | cut -f 1 -d "_" | sed -n "${SLURM_ARRAY_TASK_ID}p")
 
+#Output directory
+if [ "${SLURM_ARRAY_TASK_ID}" -eq 1 ]; then
+    mkdir -p ${HOM}/gvcf
+fi
+
 #Code
 #Index BAM files - samtools
 ${BIN}/samtools index ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam
 
 #Haplotype calling - GATK
-gatk --java-options -Xmx32G HaplotypeCaller -R ${REF}/IRGSP-1.0_genome.fasta -I ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam -O ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.g.vcf.gz -ERC GVCF
+gatk --java-options -Xmx32G HaplotypeCaller -R ${REF}/IRGSP-1.0_genome.fasta -I ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam -O ${HOM}/gvcf/${SAMPLE}.mapped.RG.sort.rmdup.g.vcf.gz -ERC GVCF
