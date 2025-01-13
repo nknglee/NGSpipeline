@@ -1,25 +1,39 @@
-#5_Genotyping: Genotyping into VCF file
-
 #!/bin/bash
 #SBATCH --verbose
-#SBATCH -c 14
+#SBATCH --mem=20G
+#SBATCH -c 12
 #SBATCH -p all
 #SBATCH -J 5_Genotyping
-#SBATCH -t 72:00:00
-#SBATCH -o 
-#SBATCH -e 
+#SBATCH -t 0-72:00:00
+#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/5_Genotyping_%j.log
+#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/5_Genotyping_%j.err
 
 #module load & libraries
 module purge
 eval "$(conda shell.bash hook)"
 conda activate ngs
 
-#variables
-DAT=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/fastq
-REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
-HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers
+#Submit command: sbatch 5_Genotyping.sh
 
-#code
-#gatk --java-options "-Xmx32G" CombineGVCFs -R ${REF}/IRGSP-1.0_genome.fasta --variant ${HOM}/gvcf.list -O ${HOM}/combined.g.vcf.gz
-#gatk --java-options "-Xmx32G" ValidateVariants -V ${HOM}/combined.g.vcf.gz
-#gatk --java-options "-Xmx32G" GenotypeGVCFs -R ${REF}/IRGSP-1.0_genome.fasta -V ${HOM}/combined.g.vcf.gz -O ${HOM}/combined.vcf.gz
+#Print the task ID
+cd "$SLURM_SUBMIT_DIR"
+echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_JOB_ID $SLURM_ARRAY_TASK_ID ${SAMPLE}
+
+#Variables
+REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
+HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
+
+#Code
+#Output directory
+mkdir -p ${HOM}/vcf
+
+#Combine GVCFs
+ls ${HOM}/gvcf/*.mapped.RG.sort.rmdup.g.vcf.gz > ${HOM}/gvcf/gvcf.list
+
+gatk --java-options "-Xmx32G" CombineGVCFs -R ${REF}/IRGSP-1.0_genome.fasta --variant ${HOM}/gvcf/gvcf.list -O ${HOM}/gvcf/combined.g.vcf.gz
+
+# Validate Variants
+gatk --java-options "-Xmx32G" ValidateVariants -V ${HOM}/gvcf/combined.g.vcf.gz
+
+# Genotype GVCFs
+gatk --java-options "-Xmx32G" GenotypeGVCFs -R ${REF}/IRGSP-1.0_genome.fasta -V ${HOM}/gvcf/combined.g.vcf.gz -O ${HOM}/vcf/combined.vcf.gz
