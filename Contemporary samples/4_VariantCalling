@@ -1,27 +1,35 @@
-#4_VariantCalling: index BAM files, haplotype calling
-
 #!/bin/bash
 #SBATCH --verbose
-#SBATCH -c 14
+#SBATCH --mem=20G
+#SBATCH -c 12
 #SBATCH -p all
 #SBATCH -J 4_VariantCalling
 #SBATCH -t 0-24:00:00
-#SBATCH -o 
-#SBATCH -e 
+#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/4_VariantCalling_%A_%a.log
+#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/4_VariantCalling_%A_%a.err
+#SBATCH --array=1-ARRAY_SIZE
 
 #module load & libraries
 module purge
 eval "$(conda shell.bash hook)"
 conda activate ngs
 
-#variables
+#Submit command: sbatch 4_VariantCalling.sh (or use Slurm_submit.sh for automated ARRAY_SIZE calculation)
+
+#Print the task ID
+cd "$SLURM_SUBMIT_DIR"
+echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_JOB_ID $SLURM_ARRAY_TASK_ID ${SAMPLE}
+
+#Variables
+BIN=/home/yky10kg/anaconda3/envs/ngs/bin
 DAT=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/fastq
 REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
-HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers
+HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
+SAMPLE=$(ls ${DAT}/*_1.fastq.gz | rev | cut -d "/" -f 1 | rev | cut -f 1 -d "_" | sed -n "${SLURM_ARRAY_TASK_ID}p")
 
-#code
+#Code
 #Index BAM files - samtools
-#cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools index ${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam"
+${BIN}/samtools index ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam
 
 #Haplotype calling - GATK
-#cat ${HOM}/sample_list | parallel --gnu -j 14 "gatk --java-options -Xmx32G HaplotypeCaller -R ${REF}/IRGSP-1.0_genome.fasta -I ${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam -O ${HOM}/mapped/{}.mapped.RG.sort.rmdup.g.vcf.gz -ERC GVCF"
+gatk --java-options -Xmx32G HaplotypeCaller -R ${REF}/IRGSP-1.0_genome.fasta -I ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam -O ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.g.vcf.gz -ERC GVCF
