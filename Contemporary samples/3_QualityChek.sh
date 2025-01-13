@@ -1,34 +1,42 @@
-#3_QualityCheck: QC of mapped/unmapped bam files
-
 #!/bin/bash
 #SBATCH --verbose
-#SBATCH -c 14
+#SBATCH --mem=20G
+#SBATCH -c 12
 #SBATCH -p all
 #SBATCH -J 3_QualityCheck
 #SBATCH -t 0-3:00:00
-#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/read_count_farmers.log
-#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/read_count_farmers.err
+#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/3_QualityCheck_%A_%a.log
+#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/3_QualityCheck_%A_%a.err
+#SBATCH --array=1-ARRAY_SIZE
 
 #module load & libraries
 module purge
 eval "$(conda shell.bash hook)"
 conda activate ngs
 
-#variables
+#Submit command: sbatch 3_QualityCheck.sh (or use Slurm_submit.sh for automated ARRAY_SIZE calculation)
+
+#Print the task ID
+cd "$SLURM_SUBMIT_DIR"
+echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_JOB_ID $SLURM_ARRAY_TASK_ID ${SAMPLE}
+
+#Variables
+BIN=/home/yky10kg/anaconda3/envs/ngs/bin
 DAT=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/fastq
 REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
-HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers
+HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
+SAMPLE=$(ls ${DAT}/*_1.fastq.gz | rev | cut -d "/" -f 1 | rev | cut -f 1 -d "_" | sed -n "${SLURM_ARRAY_TASK_ID}p")
 
-#code
-#raw fastq reads
-#zcat ${DAT}/*.fastq.gz | wc -l | awk '{print $1/4}'
+#Code
+# Raw fastq reads
+zcat ${DAT}/*.fastq.gz | wc -l | awk '{print $1/4}'
 
-#mapped reads
-#cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools flagstat ${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam"
+# Mapped reads
+${BIN}/samtools flagstat ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam
 
-#unmapped reads
-#cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools flagstat ${HOM}/unmapped/{}.unmapped.RG.sort.rmdup.bam"
+# Unmapped reads
+${BIN}/samtools flagstat ${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.rmdup.bam
 
-#read stats
-cat ${HOM}/sample_list | echo "SAMPLE=${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam\n" 
-cat ${HOM}/sample_list | /home/yky10kg/anaconda3/envs/ngs/bin/samtools stats ${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam | grep ^SN | cut -f 2-
+# Read stats
+echo "SAMPLE=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam\n"
+${BIN}/samtools stats ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam | grep ^SN | cut -f 2-
