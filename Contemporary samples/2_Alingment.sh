@@ -1,43 +1,60 @@
-#2_Alighnemt: Mapping, filtering, deduplicating
-
 #!/bin/bash
 #SBATCH --verbose
-#SBATCH -c 14
-#SBATCH -p short
+#SBATCH --mem=20G
+#SBATCH -c 12
+#SBATCH -p all
 #SBATCH -J 2_Alighnemt
 #SBATCH -t 0-24:00:00
-#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/2_Alighnemt.log
-#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/2_Alighnemt.err
+#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/2_Alighnemt.log
+#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/2_Alighnemt.err
+#SBATCH --array=1-ARRAY_SIZE
 
 #module load & libraries
 module purge
 eval "$(conda shell.bash hook)"
 conda activate ngs
 
-#variables
+#Submit command: sbatch 2_Alignment.sh (or use Slurm_submit.sh for automated ARRAY_SIZE calculation)
+
+#Print the task ID
+cd "$SLURM_SUBMIT_DIR"
+echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_JOB_ID $SLURM_ARRAY_TASK_ID ${SAMPLE}
+
+#Variables
+BIN=/home/yky10kg/anaconda3/envs/ngs/bin
 DAT=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/fastq
 REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
-HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers
+HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
+SAMPLE=$(ls ${DAT}/*_1.fastq.gz | rev | cut -d "/" -f 1 | rev | cut -f 1 -d "_" | sed -n "${SLURM_ARRAY_TASK_ID}p")
+
+#Output directory
+if [ "${SLURM_ARRAY_TASK_ID}" -eq 1 ]; then
+    mkdir -p ${HOM}/mapping
+    mkdir -p ${HOM}/mapped
+    mkdir -p ${HOM}/unmapped
+fi
 
 #code
 #mapping-bwa mem
-cat ${HOM}/sample_list | parallel --gnu -j 14 "bwa mem ${REF}/IRGSP-1.0_genome.fasta ${HOM}/trim/{}_1_paired.fastq.gz ${HOM}/trim/{}_2_paired.fastq.gz > ${HOM}/mapping/{}.sam"
+bwa mem ${REF}/IRGSP-1.0_genome.fasta ${HOM}/trim/${SAMPLE}_1_paired.fastq.gz ${HOM}/trim/${SAMPLE}_2_paired.fastq.gz > ${HOM}/mapping/${SAMPLE}.sam
 
-#deduplication of mapped&unmapped reads-samtools,picard
-#mapped
-cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools view -bS -F 4 ${HOM}/mapping/{}.sam > ${HOM}/mapped/{}.mapped.bam"
 
-cat ${HOM}/sample_list | parallel --gnu -j 14 "java -Xmx3G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/mapped/{}.mapped.bam O=${HOM}/mapped/{}.mapped.RG.bam RGID={} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM={}"
+# Deduplication of mapped reads - samtools, picard
+# Mapped
+${BIN}/samtools view -bS -F 4 ${HOM}/mapping/${SAMPLE}.sam > ${HOM}/mapped/${SAMPLE}.mapped.bam
 
-cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools sort ${HOM}/mapped/{}.mapped.RG.bam -o ${HOM}/mapped/{}.mapped.RG.sort.bam"
+java -Xmx8G -jar ${BIN}/../pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/mapped/${SAMPLE}.mapped.bam O=${HOM}/mapped/${SAMPLE}.mapped.RG.bam RGID=${SAMPLE} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM=${SAMPLE}
 
-cat ${HOM}/sample_list | parallel --gnu -j 14 "java -Xmx3G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/mapped/{}.mapped.RG.sort.bam O=${HOM}/mapped/{}.mapped.RG.sort.rmdup.bam M=${HOM}/mapped/{}.metrics.txt REMOVE_DUPLICATES=true"
+${BIN}/samtools sort ${HOM}/mapped/${SAMPLE}.mapped.RG.bam -o ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.bam
 
-#unmapped
-cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools view -bS -f 4 ${HOM}/mapping/{}.sam > ${HOM}/unmapped/{}.unmapped.bam"
+java -Xmx8G -jar ${BIN}/../pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.bam O=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam M=${HOM}/mapped/${SAMPLE}.metrics.txt REMOVE_DUPLICATES=true
 
-cat ${HOM}/sample_list | parallel --gnu -j 14 "java -Xmx3G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/unmapped/{}.unmapped.bam O=${HOM}/unmapped/{}.unmapped.RG.bam RGID={} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM={}"
 
-cat ${HOM}/sample_list | parallel --gnu -j 14 "/home/yky10kg/anaconda3/envs/ngs/bin/samtools sort ${HOM}/unmapped/{}.unmapped.RG.bam -o ${HOM}/unmapped/{}.unmapped.RG.sort.bam"
+# Unmapped
+${BIN}/samtools view -bS -f 4 ${HOM}/mapping/${SAMPLE}.sam > ${HOM}/unmapped/${SAMPLE}.unmapped.bam
 
-cat ${HOM}/sample_list | parallel --gnu -j 14 "java -Xmx3G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/unmapped/{}.unmapped.RG.sort.bam O=${HOM}/unmapped/{}.unmapped.RG.sort.rmdup.bam M=${HOM}/unmapped/{}.metrics.txt REMOVE_DUPLICATES=true"
+java -Xmx3G -jar ${BIN}/../pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/unmapped/${SAMPLE}.unmapped.bam O=${HOM}/unmapped/${SAMPLE}.unmapped.RG.bam RGID=${SAMPLE} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM=${SAMPLE}
+
+${BIN}/samtools sort ${HOM}/unmapped/${SAMPLE}.unmapped.RG.bam -o ${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.bam
+
+java -Xmx3G -jar ${BIN}/../pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.bam O=${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.rmdup.bam M=${HOM}/unmapped/${SAMPLE}.metrics.txt REMOVE_DUPLICATES=true
