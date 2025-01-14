@@ -33,19 +33,21 @@ if [ "${SLURM_ARRAY_TASK_ID}" -eq 1 ]; then
 fi
 
 #Code
-# Raw fastq reads
-echo "Raw fastq reads:" > ${HOM}/QC/quality_check_${SAMPLE}.txt
-zcat ${DAT}/${SAMPLE}.fastq.gz | wc -l | awk '{print $1/4}' >> ${HOM}/QC/quality_check_${SAMPLE}.txt
+#Raw fastq reads
+echo "Raw fastq_1 reads:" > ${HOM}/QC/quality_check_${SAMPLE}.txt
+zcat ${DAT}/${SAMPLE}_1.fastq.gz | wc -l | awk '{print $1/4}' >> ${HOM}/QC/quality_check_${SAMPLE}.txt
+echo "Raw fastq_2 reads:" >> ${HOM}/QC/quality_check_${SAMPLE}.txt
+zcat ${DAT}/${SAMPLE}_2.fastq.gz | wc -l | awk '{print $1/4}' >> ${HOM}/QC/quality_check_${SAMPLE}.txt
 
-# Mapped reads
+#Mapped reads
 echo -e "\nMapped reads:" >> ${HOM}/QC/quality_check_${SAMPLE}.txt
 ${BIN}/samtools flagstat ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam >> ${HOM}/QC/quality_check_${SAMPLE}.txt
 
-# Unmapped reads
+#Unmapped reads
 echo -e "\nUnmapped reads:" >> ${HOM}/QC/quality_check_${SAMPLE}.txt
 ${BIN}/samtools flagstat ${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.rmdup.bam >> ${HOM}/QC/quality_check_${SAMPLE}.txt
 
-# Read stats
+#Read stats
 echo -e "\nRead stats:" >> ${HOM}/QC/quality_check_${SAMPLE}.txt
 echo "SAMPLE=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam" >> ${HOM}/QC/quality_check_${SAMPLE}.txt
 ${BIN}/samtools stats ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam | grep ^SN | cut -f 2- >> ${HOM}/QC/quality_check_${SAMPLE}.txt
