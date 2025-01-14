@@ -10,6 +10,7 @@
 #SBATCH --array=1-ARRAY_SIZE
 
 #module load & libraries
+module load gatk
 module purge
 eval "$(conda shell.bash hook)"
 conda activate ngs
