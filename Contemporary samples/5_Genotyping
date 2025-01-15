@@ -23,13 +23,14 @@ echo "My SLURM_JOB_ID: " $SLURM_JOB_ID
 REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
 HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
 
-#Code
 #Output directory
 mkdir -p ${HOM}/vcf
 
-#Combine GVCFs
+#Code
+#Sample list for genotyping
 ls ${HOM}/gvcf/*.mapped.RG.sort.rmdup.g.vcf.gz > ${HOM}/gvcf/gvcf.list
 
+#Combine GVCFs
 gatk --java-options "-Xmx32G" CombineGVCFs -R ${REF}/IRGSP-1.0_genome.fasta --variant ${HOM}/gvcf/gvcf.list -O ${HOM}/gvcf/combined.g.vcf.gz
 
 # Validate Variants
