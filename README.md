@@ -1,8 +1,8 @@
 # NGSpipeline
-  Pipeline for NGS reads processing
+Pipeline for NGS reads processing
 
   Pre-processing: Quality check and adapter/quality trimming step \
-  Alighnemt: Mapping, filtering, deduplicating \
+  Alignemt: Mapping, filtering, deduplicating \
   QualityCheck: QC of mapped/unmapped bam files \
     *aDNA-Characterization: Authentication of aDNA characteristics \
   VariantCalling: index BAM files, haplotype calling \
