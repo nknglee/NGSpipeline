@@ -4,7 +4,7 @@ Pipeline for NGS reads processing
   Pre-processing: Quality check and adapter/quality trimming step \
   Alignemt: Mapping, filtering, deduplicating \
   QualityCheck: QC of mapped/unmapped bam files \
-    *aDNA-Characterization: Authentication of aDNA characteristics \
+  	* aDNA-Characterization: Authentication of aDNA characteristics \
   VariantCalling: index BAM files, haplotype calling \
   Genotyping: Genotyping into VCF file \
   Post-processing: SNP filtering, annotation 
