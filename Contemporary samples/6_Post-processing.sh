@@ -38,7 +38,7 @@ bgzip ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.recode.vcf
 tabix -p vcf ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.recode.vcf.gz
 
 #Annotattion
-java -jar ${JAR}/snpEff.jar build -gff3 -v IRGSP
+java -jar ${JAR}/snpEff.jar download -v Oryza_sativa
 java -Xmx16g -jar ${JAR}/snpEff.jar -v IRGSP ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.recode.vcf.gz > ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.IRGSP.annotated.recode.vcf.gz
 
 #SNP filtering - plink
