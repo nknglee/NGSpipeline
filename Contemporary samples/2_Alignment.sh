@@ -43,18 +43,18 @@ bwa mem ${REF}/IRGSP-1.0_genome.fasta ${HOM}/trim/${SAMPLE}_1_paired.fastq.gz ${
 # Mapped
 ${BIN}/samtools view -bS -F 4 ${HOM}/mapping/${SAMPLE}.sam > ${HOM}/mapped/${SAMPLE}.mapped.bam
 
-java -Xmx8G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/mapped/${SAMPLE}.mapped.bam O=${HOM}/mapped/${SAMPLE}.mapped.RG.bam RGID=${SAMPLE} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM=${SAMPLE}
+java -Xmx8G -jar ~/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/mapped/${SAMPLE}.mapped.bam O=${HOM}/mapped/${SAMPLE}.mapped.RG.bam RGID=${SAMPLE} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM=${SAMPLE}
 
 ${BIN}/samtools sort ${HOM}/mapped/${SAMPLE}.mapped.RG.bam -o ${HOM}/mapped/${SAMPLE}.mapped.RG.sort.bam
 
-java -Xmx8G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.bam O=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam M=${HOM}/mapped/${SAMPLE}.metrics.txt REMOVE_DUPLICATES=true
+java -Xmx8G -jar ~/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.bam O=${HOM}/mapped/${SAMPLE}.mapped.RG.sort.rmdup.bam M=${HOM}/mapped/${SAMPLE}.metrics.txt REMOVE_DUPLICATES=true
 
 
 # Unmapped
 ${BIN}/samtools view -bS -f 4 ${HOM}/mapping/${SAMPLE}.sam > ${HOM}/unmapped/${SAMPLE}.unmapped.bam
 
-java -Xmx3G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/unmapped/${SAMPLE}.unmapped.bam O=${HOM}/unmapped/${SAMPLE}.unmapped.RG.bam RGID=${SAMPLE} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM=${SAMPLE}
+java -Xmx3G -jar ~/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar AddOrReplaceReadGroups I=${HOM}/unmapped/${SAMPLE}.unmapped.bam O=${HOM}/unmapped/${SAMPLE}.unmapped.RG.bam RGID=${SAMPLE} RGLB=lib1 RGPL=Illumina RGPU=unit1 RGSM=${SAMPLE}
 
 ${BIN}/samtools sort ${HOM}/unmapped/${SAMPLE}.unmapped.RG.bam -o ${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.bam
 
-java -Xmx3G -jar /home/yky10kg/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.bam O=${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.rmdup.bam M=${HOM}/unmapped/${SAMPLE}.metrics.txt REMOVE_DUPLICATES=true
+java -Xmx3G -jar ~/anaconda3/pkgs/picard-3.2.0-hdfd78af_0/share/picard-3.2.0-0/picard.jar MarkDuplicates I=${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.bam O=${HOM}/unmapped/${SAMPLE}.unmapped.RG.sort.rmdup.bam M=${HOM}/unmapped/${SAMPLE}.metrics.txt REMOVE_DUPLICATES=true
