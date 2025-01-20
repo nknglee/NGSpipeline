@@ -26,19 +26,19 @@ HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
 JAR=/home/yky10kg/anaconda3/pkgs/snpeff-5.2-hdfd78af_1/share/snpeff-5.2-1
 
 #Code
-#Compress and index
-bgzip ${HOM}/vcf/combined.vcf
-tabix -p vcf ${HOM}/vcf/combined.vcf.gz
+#Compress and index - ONLY IF NEEDED
+#bgzip ${HOM}/vcf/combined.vcf
+#tabix -p vcf ${HOM}/vcf/combined.vcf.gz
 
 #SNP filtering - vcftools
 vcftools --gzvcf ${HOM}/vcf/combined.vcf.gz --remove-indels --maf 0.05 --max-missing 0.75 --minQ 30 --minDP 4 --mac 1 --max-alleles 2 --recode --recode-INFO-all --out ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele
 
 #Compress and index
-bgzip ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.vcf
-tabix -p vcf ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.vcf.gz
+bgzip ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.recode.vcf
+tabix -p vcf ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.recode.vcf.gz
 
 #Annotattion
 java -jar ${JAR}/snpEff.jar build -gff3 -v IRGSP
-java -Xmx16g -jar ${JAR}/snpEff.jar -v IRGSP ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.vcf.gz > ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.IRGSP.annotated.vcf.gz
+java -Xmx16g -jar ${JAR}/snpEff.jar -v IRGSP ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.recode.vcf.gz > ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.IRGSP.annotated.recode.vcf.gz
 
 #SNP filtering - plink
