@@ -12,6 +12,7 @@
 module purge
 eval "$(conda shell.bash hook)"
 conda activate ngs
+module load vcftools plink
 
 #Submit command: sbatch 6_Post-processing.sh
 
@@ -22,6 +23,7 @@ echo "My SLURM_JOB_ID: " $SLURM_JOB_ID
 #Variables
 REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
 HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
+JAR=/home/yky10kg/anaconda3/pkgs/snpeff-5.2-hdfd78af_1/share/snpeff-5.2-1
 
 #Code
 #Compress and index
@@ -36,5 +38,7 @@ bgzip ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.vcf
 tabix -p vcf ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.vcf.gz
 
 #Annotattion
-java -jar ~/snpEff/snpEff.jar build -gff3 -v IRGSP
-java -Xmx16g -jar ~/snpEff/snpEff.jar -v IRGSP ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.vcf.gz > ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.IRGSP.annotated.vcf.gz
+java -jar ${JAR}/snpEff.jar build -gff3 -v IRGSP
+java -Xmx16g -jar ${JAR}/snpEff.jar -v IRGSP ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.vcf.gz > ${HOM}/vcf/output.SNPs.maf005.MM075.q30.d4.biallele.IRGSP.annotated.vcf.gz
+
+#SNP filtering - plink
