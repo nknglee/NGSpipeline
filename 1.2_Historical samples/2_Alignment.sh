@@ -22,7 +22,7 @@ echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_JOB_ID $SLURM_ARRAY_TASK_ID ${SAMPL
 
 #Variables
 BIN=/home/yky10kg/anaconda3/envs/ngs/bin
-DAT=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/herbarium/fastq
+DAT=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/herbarium/trial/fastq
 REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
 HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/herbarium/trial
 SAMPLE=$(ls ${DAT}/*_1.fastq.gz | rev | cut -d "/" -f 1 | rev | cut -f 1 -d "_" | sed -n "${SLURM_ARRAY_TASK_ID}p")
