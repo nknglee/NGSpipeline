@@ -3,7 +3,7 @@
 #SBATCH --mem=20G
 #SBATCH -c 12
 #SBATCH -p all
-#SBATCH -J 6_Post-processing
+#SBATCH -J Post-processing
 #SBATCH -t 0-48:00:00
 #SBATCH -o /path/to/log/Post-processing_%j.log
 #SBATCH -e /path/to/log/Post-processing_%j.err
@@ -14,7 +14,7 @@ eval "$(conda shell.bash hook)"
 conda activate ngs
 module load vcftools plink
 
-#Submit command: sbatch 6_Post-processing.sh
+#Submit command: sbatch Post-processing.sh
 
 #Print the task ID
 cd "$SLURM_SUBMIT_DIR"
