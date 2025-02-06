@@ -25,7 +25,7 @@ sbatch ./Modified_script.sh
 
 # Job records
 cd "$SLURM_SUBMIT_DIR"
-echo "SLURM_JOB_ID: $SLURM_JOB_ID" >> /path/to/log/Slurm_Record_%j.log
-echo "Date: $(date)" >> /path/to/log/Slurm_Record_%j.log
-echo "Array Size: $ARRAY_SIZE" >> /path/to/log/Slurm_Record_%j.log
-echo "--------------------------------------------" >> /path/to/log/Slurm_Record_%j.log
+echo "SLURM_JOB_ID: $SLURM_JOB_ID" >> /path/to/log/Slurm_Record.log
+echo "Date: $(date)" >> /path/to/log/Slurm_Record.log
+echo "Array Size: $ARRAY_SIZE" >> /path/to/log/Slurm_Record.log
+echo "--------------------------------------------" >> /path/to/log/Slurm_Record.log
