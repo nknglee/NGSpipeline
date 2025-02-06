@@ -5,26 +5,24 @@
 #SBATCH -p all
 #SBATCH -J 5_Genotyping
 #SBATCH -t 0-72:00:00
-#SBATCH -o /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/5_Genotyping_%j.log
-#SBATCH -e /data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial/log/5_Genotyping_%j.err
+#SBATCH -o /path/to/log/5_Genotyping_%j.log
+#SBATCH -e /path/to/log/5_Genotyping_%j.err
 
 #module load & libraries
 module purge
 eval "$(conda shell.bash hook)"
 conda activate ngs
 
-#Submit command: sbatch 5_Genotyping.sh
+#Submit command: sbatch Genotyping.sh
 
 #Print the task ID
 cd "$SLURM_SUBMIT_DIR"
 echo "My SLURM_JOB_ID: " $SLURM_JOB_ID
 
 #Variables
-REF=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/ref
-HOM=/data/users_area/yky10kg/GREENrice/Cons_Gen/datasets/farmers/trial
+REF=/path/to/ref
+HOM=/path/to/working/directory
 
-#Output directory
-mkdir -p ${HOM}/vcf
 
 #Code
 #Sample list for genotyping
