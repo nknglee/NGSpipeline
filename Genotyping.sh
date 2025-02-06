@@ -3,10 +3,10 @@
 #SBATCH --mem=20G
 #SBATCH -c 12
 #SBATCH -p all
-#SBATCH -J 5_Genotyping
+#SBATCH -J Genotyping
 #SBATCH -t 0-72:00:00
-#SBATCH -o /path/to/log/5_Genotyping_%j.log
-#SBATCH -e /path/to/log/5_Genotyping_%j.err
+#SBATCH -o /path/to/log/Genotyping_%j.log
+#SBATCH -e /path/to/log/Genotyping_%j.err
 
 #module load & libraries
 module purge
